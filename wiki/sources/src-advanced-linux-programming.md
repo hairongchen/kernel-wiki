@@ -1,5 +1,6 @@
 ---
 type: source
+title: "Advanced Linux Programming"
 created: 2026-04-09
 updated: 2026-04-09
 sources: [advanced-linux-programming]

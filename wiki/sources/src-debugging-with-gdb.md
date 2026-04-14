@@ -1,5 +1,6 @@
 ---
 type: source
+title: "Debugging with GDB"
 created: 2026-04-09
 updated: 2026-04-09
 sources: [debugging-with-gdb]

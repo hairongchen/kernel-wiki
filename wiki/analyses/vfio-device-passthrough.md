@@ -1,5 +1,5 @@
 ---
-type: entity
+type: analysis
 created: 2026-04-09
 updated: 2026-04-09
 sources: [qemu-kvm-source-code-and-application, mastering-kvm-virtualization]
@@ -243,7 +243,7 @@ Physical device raises MSI-X interrupt
   → (With APICv/posted interrupts: delivered without VM Exit)
 ```
 
-This is the same irqfd mechanism used by [vhost](vhost.md), providing low-latency interrupt delivery that bypasses QEMU's event loop entirely.
+This is the same irqfd mechanism used by [vhost](../entities/vhost.md), providing low-latency interrupt delivery that bypasses QEMU's event loop entirely.
 
 ## SR-IOV Passthrough
 
@@ -284,7 +284,7 @@ lspci | grep "Virtual Function"
 # Bind VF to vfio-pci and assign to VM (same process as any device)
 ```
 
-See [kvm-networking](kvm-networking.md) for libvirt XML examples of VF assignment using `<hostdev>` and `<interface type='hostdev'>`.
+See [kvm-networking](../entities/kvm-networking.md) for libvirt XML examples of VF assignment using `<hostdev>` and `<interface type='hostdev'>`.
 
 ### SR-IOV vs Full Device Passthrough
 
@@ -327,10 +327,11 @@ VFIO enforces that all devices in an IOMMU group must be controlled by VFIO (or 
 
 ## See also
 
-- [device-driver-model](device-driver-model.md)
-- [kvm-networking](kvm-networking.md)
-- [kvm-interrupt-virtualization](kvm-interrupt-virtualization.md)
-- [kvm-memory-virtualization](kvm-memory-virtualization.md)
-- [kvm-performance-tuning](kvm-performance-tuning.md)
+- [device-driver-model](../entities/device-driver-model.md)
+- [kvm-networking](../entities/kvm-networking.md)
+- [kvm-interrupt-virtualization](../entities/kvm-interrupt-virtualization.md)
+- [kvm-memory-virtualization](../entities/kvm-memory-virtualization.md)
+- [kvm-performance-tuning](../entities/kvm-performance-tuning.md)
 - [concept-hardware-virtualization](../concepts/concept-hardware-virtualization.md)
 - [concept-virtio-data-plane](../concepts/concept-virtio-data-plane.md)
+- [vfio-device-passthrough-zh](vfio-device-passthrough-zh.md) — Chinese version / 中文版

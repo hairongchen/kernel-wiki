@@ -171,4 +171,4 @@ The pattern is clear: identify the hot path, then move it out of QEMU's main loo
 - [vhost](../entities/vhost.md)
 - [vm-live-migration](../entities/vm-live-migration.md)
 - [concept-hardware-virtualization](concept-hardware-virtualization.md)
-- [vfio-device-passthrough](../entities/vfio-device-passthrough.md)
+- [vfio-device-passthrough](../analyses/vfio-device-passthrough.md)

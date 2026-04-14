@@ -1,5 +1,6 @@
 ---
 type: source
+title: "Linux Kernel in a Nutshell"
 created: 2026-04-08
 updated: 2026-04-08
 sources: [linux-kernel-in-a-nutshell]

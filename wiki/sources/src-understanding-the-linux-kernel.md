@@ -1,5 +1,6 @@
 ---
 type: source
+title: "Understanding the Linux Kernel, 3rd Edition"
 created: 2026-04-08
 updated: 2026-04-08
 sources: [understanding-the-linux-kernel]

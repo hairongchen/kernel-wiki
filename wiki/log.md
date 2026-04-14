@@ -225,7 +225,7 @@ Created a new comparison page analyzing the trade-offs between the three Linux k
 Created a new entity page covering VFIO and IOMMU-based device passthrough for KVM guests. Fills the gap identified in overview.md for VFIO/device passthrough details.
 
 **New entity page:**
-- [vfio-device-passthrough](entities/vfio-device-passthrough.md) — IOMMU hardware (VT-d/AMD-Vi), DMA remapping, interrupt remapping, IOMMU groups, VFIO kernel framework (container/group/device hierarchy), QEMU integration (DMA mapping, BAR exposure, irqfd interrupts), SR-IOV passthrough (PF/VF), security model, trade-offs
+- [vfio-device-passthrough](analyses/vfio-device-passthrough.md) — IOMMU hardware (VT-d/AMD-Vi), DMA remapping, interrupt remapping, IOMMU groups, VFIO kernel framework (container/group/device hierarchy), QEMU integration (DMA mapping, BAR exposure, irqfd interrupts), SR-IOV passthrough (PF/VF), security model, trade-offs
 
 **Updated:**
 - [index.md](index.md) — Added entity page entry
@@ -233,3 +233,50 @@ Created a new entity page covering VFIO and IOMMU-based device passthrough for K
 - [kvm-networking](entities/kvm-networking.md) — Added cross-link
 - [concept-hardware-virtualization](concepts/concept-hardware-virtualization.md) — Added cross-link
 - [concept-virtio-data-plane](concepts/concept-virtio-data-plane.md) — Added cross-link
+
+## [2026-04-10] create | Analysis: Interrupt Delivery Process
+
+Created a new analysis page tracing end-to-end interrupt delivery for both running and halted CPU scenarios.
+
+**New analysis page:**
+- [analysis-interrupt-delivery-process](analyses/analysis-interrupt-delivery-process.md) — Complete interrupt delivery lifecycle: I/O APIC / MSI routing, LAPIC acceptance (IRR → priority filter → INTR), running CPU scenario (IF check, instruction boundary, hardware context save, IDT dispatch, do_IRQ), halted CPU scenario (C-state exit, HLT wakeup, sti;hlt atomicity), IPI delivery for reschedule/TLB shootdown, edge vs. level trigger modes, latency comparison table, practical tuning knobs, KVM posted-interrupt crossover
+
+**Updated:**
+- [index.md](index.md) — Added first analysis page entry
+
+## [2026-04-10] create | Chinese version of interrupt delivery analysis
+
+Created a Chinese translation of the interrupt delivery process analysis page.
+
+**New analysis page:**
+- [analysis-interrupt-delivery-process-zh](analyses/analysis-interrupt-delivery-process-zh.md) — 中断传递流程（中文版）：完整中断传递生命周期的中文翻译，涵盖运行与停机 CPU 场景
+
+**Updated:**
+- [index.md](index.md) — Added Chinese analysis entry
+- [analysis-interrupt-delivery-process](analyses/analysis-interrupt-delivery-process.md) — Added cross-link to Chinese version
+
+## [2026-04-10] create | Chinese version of VFIO device passthrough entity
+
+Created a Chinese translation of the VFIO/IOMMU device passthrough entity page.
+
+**New entity page:**
+- [vfio-device-passthrough-zh](analyses/vfio-device-passthrough-zh.md) — VFIO 与 IOMMU 设备直通（中文版）
+
+**Updated:**
+- [index.md](index.md) — Added Chinese entity entry
+- [vfio-device-passthrough](analyses/vfio-device-passthrough.md) — Added cross-link to Chinese version
+
+## [2026-04-10] move | vfio-device-passthrough to analyses
+
+Moved `entities/vfio-device-passthrough.md` and `entities/vfio-device-passthrough-zh.md` to `analyses/`. Updated frontmatter type from entity to analysis. Updated all inbound links (index.md, concept-virtio-data-plane.md, concept-hardware-virtualization.md, kvm-networking.md) and internal See also links in both files.
+
+## [2026-04-10] lint | Health check and fixes
+
+Scanned all 80 wiki pages. Found and fixed:
+- **4 broken links** in `analyses/vfio-device-passthrough.md` and `analyses/vfio-device-passthrough-zh.md` — inline body links to `vhost.md` and `kvm-networking.md` still used same-directory paths after move to `analyses/`; fixed to `../entities/` relative paths
+- **8 missing `title:` fields** in all source summary pages — added `title:` to frontmatter of all 8 `sources/src-*.md` files per schema requirements
+
+Not fixed (accepted):
+- 4 over-length analysis pages (337-438 lines) — analyses are long by nature
+
+Post-fix verification: 0 broken links, 0 orphan pages, 0 missing frontmatter fields.

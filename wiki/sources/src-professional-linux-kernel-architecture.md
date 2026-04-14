@@ -1,5 +1,6 @@
 ---
 type: source
+title: "Professional Linux Kernel Architecture"
 created: 2026-04-09
 updated: 2026-04-09
 sources: [professional-linux-kernel-architecture]

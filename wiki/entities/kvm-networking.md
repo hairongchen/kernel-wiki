@@ -290,4 +290,4 @@ Configuring MTU 9000 on the bridge, physical NIC (`ip link set dev mtu 9000`), a
 - [net-device](net-device.md)
 - [qemu-kvm-overview](qemu-kvm-overview.md)
 - [vm-live-migration](vm-live-migration.md)
-- [vfio-device-passthrough](vfio-device-passthrough.md)
+- [vfio-device-passthrough](../analyses/vfio-device-passthrough.md)

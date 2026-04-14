@@ -65,7 +65,6 @@ Content catalog for the Kernel Wiki. Organized by page type.
 - [kvm-performance-tuning](entities/kvm-performance-tuning.md) — KVM performance tuning: CPU pinning, NUMA, hugepages, KSM, I/O tuning, vhost-net, tuned profiles
 - [vm-snapshots-templates](entities/vm-snapshots-templates.md) — VM snapshots and templates: virt-sysprep, virt-clone, internal/external snapshots, blockcommit/blockpull
 - [v2v-p2v-migration](entities/v2v-p2v-migration.md) — V2V/P2V migration: virt-v2v (VMware/Xen/Hyper-V to KVM), virt-p2v (physical-to-virtual)
-- [vfio-device-passthrough](entities/vfio-device-passthrough.md) — VFIO framework, IOMMU groups, DMA/interrupt remapping, PCI/SR-IOV device passthrough to KVM guests
 
 ### Infrastructure
 - [interrupt-handling](entities/interrupt-handling.md) — IDT, PIC/APIC, do_IRQ, softirqs, tasklets, work queues
@@ -126,4 +125,7 @@ Content catalog for the Kernel Wiki. Organized by page type.
 
 ## Analyses
 
-_No analyses yet._
+- [analysis-interrupt-delivery-process](analyses/analysis-interrupt-delivery-process.md) — End-to-end interrupt delivery: LAPIC acceptance, IRR/ISR/PPR filtering, running vs. halted CPU scenarios, IPI wakeup, C-state exit latency
+- [analysis-interrupt-delivery-process-zh](analyses/analysis-interrupt-delivery-process-zh.md) — 中断传递流程（中文版）：LAPIC 接受、IRR/ISR/PPR 过滤、运行与停机 CPU 场景、IPI 唤醒、C-state 退出延迟
+- [vfio-device-passthrough](analyses/vfio-device-passthrough.md) — VFIO framework, IOMMU groups, DMA/interrupt remapping, PCI/SR-IOV device passthrough to KVM guests
+- [vfio-device-passthrough-zh](analyses/vfio-device-passthrough-zh.md) — VFIO 与 IOMMU 设备直通（中文版）：IOMMU 组、DMA/中断重映射、PCI/SR-IOV 设备直通
