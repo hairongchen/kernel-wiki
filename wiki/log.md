@@ -315,3 +315,125 @@ Created a comprehensive entity page covering KVM PMU virtualization architecture
 - [kvm-cpu-virtualization](entities/kvm-cpu-virtualization.md) — Added cross-link to PMU page
 - [concept-hardware-virtualization](concepts/concept-hardware-virtualization.md) — Added Generation 5 (Mediated PMU) to VM-Exit elimination trajectory, added cross-link
 - [cmp-emulated-vs-mediated-pmu](comparisons/cmp-emulated-vs-mediated-pmu.md) — Added cross-link to entity page
+
+## [2026-04-10] create | Analysis: VM Exit Reduction and Timer Virtualization
+
+Created a comprehensive analysis page (in Chinese) covering the history of VM Exit elimination techniques and timer virtualization optimization in KVM. Synthesizes information from existing wiki pages and additional domain knowledge.
+
+**New analysis page:**
+- [analysis-vm-exit-reduction-and-timer-virtualization](analyses/analysis-vm-exit-reduction-and-timer-virtualization.md) — VM Exit 消除发展历程与 Timer 虚拟化优化：五代硬件演进（VT-x → EPT → APICv → VT-d → Mediated PMU），Timer VM Exit 三大来源（LAPIC Timer/PIT/HPET），六阶段优化技术（Tickless → TSC-deadline → APICv → Preemption Timer → MSR bitmap → kvmclock），未来展望（机密计算、极致低延迟）
+
+**Updated:**
+- [index.md](index.md) — Added analysis page entry
+
+## [2026-04-10] update | Enhanced Timer VM Exit analysis with kernel source details
+
+Enhanced the VM Exit reduction and timer virtualization analysis page with detailed source-level information from the latest Linux kernel (`arch/x86/kvm/lapic.c`, `arch/x86/kvm/vmx/vmx.c`, `arch/x86/kvm/lapic.h`). Major additions:
+
+- **`kvm_timer` struct** definition and field-by-field explanation
+- **VMX Preemption Timer (hv_timer)** deep-dive: `kvm_can_use_hv_timer()` decision logic, `vmx_set_hv_timer()` TSC delta calculation, fastpath handling (`handle_fastpath_preemption_timer()` returning `EXIT_FASTPATH_REENTER_GUEST` for minimal overhead)
+- **Posted Timer Interrupt** mechanism: `kvm_can_post_timer_interrupt()` conditions (`pi_inject_timer` + APICv + HLT-in-guest), complete delivery flow eliminating VM Exit entirely
+- **Adaptive Timer Advance** algorithm: `adjust_lapic_timer_advance()` step-by-step tuning (initial 1us, max 5us, step 1/8), `kvm_wait_lapic_expire()` busy-wait for precision, `__wait_lapic_expire()` implementation
+- **HLT/MWAIT-in-guest** synergy: `CPU_BASED_HLT_EXITING` bit clearing, interaction with posted timer interrupt
+- **ASCII decision tree** showing timer backend selection (hrtimer → hv_timer → posted timer interrupt)
+- **Module parameters** table (`lapic_timer_advance`, `preemption_timer`, `pi_inject_timer`)
+- **Enhanced future outlook**: residual VM Exit analysis (TSC_DEADLINE MSR write, nested virt, periodic mode), Confidential Computing timer challenges (TDX/SEV-SNP trust model), optimal real-time configuration stack
+
+## [2026-04-10] ingest | Two articles from raw/articles/
+
+Ingested two presentation PDFs on KVM VM Exit optimization techniques.
+
+**Source summaries (2 new):**
+- [src-lcna-co2012-sekiyama](sources/src-lcna-co2012-sekiyama.md) — "Improvement of Real-time Performance of KVM" by Tomoki Sekiyama (Hitachi, LinuxCon 2012). CPU isolation via `KVM_SET_SLAVE_CPU`, direct interrupt delivery (disable external interrupt exiting), NMI-based host→guest IPI, direct EOI via x2APIC MSR passthrough, vector remapping for passed-through devices
+- [src-minimizing-vmexits-pv-ipi-passthrough-timer](sources/src-minimizing-vmexits-pv-ipi-passthrough-timer.md) — "Minimizing VMExits by Aggressive PV IPI and Passthrough Timer" by Huaqiao & Yibo Zhou (ByteDance, ~2020). Timer passthrough (direct physical LAPIC timer access, host timer offloading to preemption timer), NoExit PVIPI (pi_desc passthrough, MSR.ICR non-intercept, guest-level posted-interrupt IPI)
+
+**Updated entity pages (2):**
+- [kvm-interrupt-virtualization](entities/kvm-interrupt-virtualization.md) — Added "Direct Interrupt Delivery" section (Sekiyama: CPU isolation + VMCS pin-based controls + NMI signaling + vector remapping + direct EOI), "NoExit PV IPI" section (ByteDance: pi_desc passthrough + MSR.ICR non-intercept + guest-side posted-interrupt IPI flow + performance data), updated interrupt delivery summary with 2 new paths
+- [kvm-performance-tuning](entities/kvm-performance-tuning.md) — Added "CPU Isolation (Extreme RT Mode)" subsection under CPU Pinning
+
+**Updated analysis pages (1):**
+- [analysis-vm-exit-reduction-and-timer-virtualization](analyses/analysis-vm-exit-reduction-and-timer-virtualization.md) — Added section "三点五" on ByteDance Timer Passthrough: physical LAPIC timer direct access, TSC offset adjustment, host timer offloading, comparison table with 6 approaches, memcached +35.5% / cyclictest -30% benchmarks, NoExit PVIPI IPI cost comparison (11486→412 cycles). Updated future outlook to reference Timer Passthrough and Sekiyama's CPU isolation
+
+## [2026-04-10] update | Deep restructuring of VM Exit analysis with ingested article content
+
+Restructured and enriched the VM Exit reduction and timer virtualization analysis page based on the two newly ingested articles (Sekiyama 2012, ByteDance ~2020).
+
+**Structural changes:**
+- Renamed "三点五" section to proper "阶段九: Timer Passthrough" and "阶段十: NoExit PVIPI", relocated under section 3.2 (Timer VM Exit 优化的技术演进) alongside stages 一-八
+- Updated five-generation timeline in section 二 to include "前沿 (~2020)" entry for Timer Passthrough and NoExit PVIPI
+- Updated ASCII decision tree in section 3.3 to include Timer Passthrough as a fourth timer backend path
+
+**Content additions:**
+- Added "行业方案对比" subsection under 阶段九 with Tencent (Wanpeng Li exitless timer/IPI), Alibaba (Yang Zhang PV timer), and ByteDance (Timer Passthrough + NoExit PVIPI) competitive landscape
+- Added Timer Passthrough and NoExit PVIPI rows to section 3.4 comparison table
+- Added new section 4.5 (硬件直通方案的安全挑战): pi_desc exposure risks, EPTP Switch/VMFUNC hardening, physical timer contention, CoCo interaction
+- Expanded section 4.6 (极致低延迟场景) with Sekiyama's specific RT use cases (factory automation, embedded systems, automated trading, HPC) and two-scenario configuration stack (通用低延迟 vs. 极致低延迟)
+- Added IPI VM Exit bullet to section 4.1 (残余 VM Exit) referencing NoExit PVIPI
+
+## [2026-04-14] ingest | Batch ingest of raw/articles (3 new sources + 1 corrupted)
+
+Ingested three new sources from `raw/articles/` covering VM Exit reduction techniques from Chinese cloud vendors. One file (`tencent_solution_VMExit.pdf`) was found to be corrupted (invalid PDF header) — its content is partially covered by `all_solution_VMExit.pdf`.
+
+**Source summaries created:**
+- [src-all-solution-vmexit](sources/src-all-solution-vmexit.md) — Zhihu article by @惠伟: kvm_stat diagnosis of timer VM Exits (93% external interrupt from local timer, 62.5% MSR_WRITE from TSC_DEADLINE), comparison of three exit-less timer solutions from Tencent, Alibaba, and ByteDance
+- [src-bytedance-solution-vmexit](sources/src-bytedance-solution-vmexit.md) — InfoQ article by Volcengine/ByteDance (2024-12): comprehensive edge high-performance VM architecture with four key techniques (interrupt non-exit, timer passthrough, VFIO interrupt bypass, IPI extreme fastpath) + kernel resource dynamic isolation. Benchmarks show >99% VM Exit reduction, 6-16% application throughput gains, CDN/streaming/acceleration production deployments
+- [src-bytedance-solution-vmexit-code](sources/src-bytedance-solution-vmexit-code.md) — RFC kernel patch by dengqiao.joey/Yang Zhang (2020-09): full implementation of Passthrough IPI exposing pi_desc and physical ICR to guest, reducing IPI from 7K to 2K cycles. 14 files, +434 lines. Not merged upstream (security concerns)
+
+**Concept page created:**
+- [concept-exitless-timer](concepts/concept-exitless-timer.md) — Cross-cutting concept covering the three vendor approaches to eliminating timer VM Exits (Tencent posted-interrupt, Alibaba shared-page, ByteDance passthrough), prerequisites, and comparison
+
+**Entity pages updated (frontmatter + source lists):**
+- [kvm-interrupt-virtualization](entities/kvm-interrupt-virtualization.md) — Added new source references and tags
+- [kvm-performance-tuning](entities/kvm-performance-tuning.md) — Added new source references and tags
+
+**Analysis page updated:**
+- [analysis-vm-exit-reduction-and-timer-virtualization](analyses/analysis-vm-exit-reduction-and-timer-virtualization.md) — Added new sources to frontmatter
+
+**Note:** `tencent_solution_VMExit.pdf` has invalid PDF header — could not be ingested. Tencent's exit-less timer approach is documented via the all_solution survey article instead.
+
+## [2026-04-14] update | analysis-vm-exit-reduction-and-timer-virtualization.md
+
+Major update integrating content from three newly ingested sources. Page grew from ~566 to ~766 lines.
+
+**Section 一 (VM Exit 代价)**:
+- Added real-world `kvm_stat` diagnosis table from @惠伟: MSR_WRITE (95K, 62.5% from TSC_DEADLINE), EXTERNAL_INTERRUPT (35K, 93% from local timer), EPT_MISCONFIG (12K)
+- Added diagnostic methodology (VM-Exit interruption info field analysis, MSR trace)
+
+**Section 3.2 (行业方案对比)**:
+- Expanded Alibaba PV Timer (Yang Zhang) description: shared-page mechanism, 7-part RFC patch series, trade-offs (eliminates MSR exit but wastes CPU on polling)
+- Added Tencent exitless timer patch details ([v7,1/2] + [v7,2/2])
+- Enhanced comparison table with "额外 CPU 开销" and "上游状态" columns
+
+**Section 3.2 阶段十 (NoExit PVIPI)**:
+- Added complete `pvipi_msr` union structure and MSR definitions from RFC patch
+- Added guest-side fast path (`kvm_send_ipi()`) step-by-step: wrmsr_fence → set PIR → set ON → read nv/ndst → write physical ICR
+- Added host-side implementation: pi_desc pointer change, pi_desc_setup(), PVIPI_PAGE_PRIVATE_MEMSLOT, MSR interception toggle
+- Added mailing list discussion: Wanpeng Li security concerns, Yang Zhang TikTok production results
+- Added dual benchmark comparison (KVM Forum 412 cycles vs RFC patch 2K cycles)
+- Added limitation: max 128 vCPU
+
+**New section 五 (Volcengine 边缘高性能虚拟机)**:
+- §5.1 Architecture: design goals, control-plane/data-plane CPU split diagram
+- §5.2 Four key technologies: (1) Guest interrupt non-exit (INTR_EXITING + host IRQ migration + IPI-as-NMI), (2) Timer passthrough cross-reference, (3) VFIO interrupt bypass (direct IOMMU IRTE modification bypassing Posted-Interrupt), (4) IPI Extreme Fastpath (assembly-optimized VMM emulation, distinct from NoExit PVIPI)
+- §5.3 Dynamic kernel isolation framework: table comparing static (nohz_full/isolcpus cmdline) vs dynamic (enter/exit Guest) isolation for timer/interrupt/process dimensions
+- §5.4 Micro benchmarks: IPI -22%, broadcast IPI -17%, timer -12.5%, TSC_DEADLINE write -89%, VM Exit count >99% reduction
+- §5.5 Macro benchmarks: wrk +6%, Apache +12%, Redis +16%, netperf +8-13%
+- §5.5 Production deployments: CDN -13.9-23.2% CPU, streaming -23.7% CPU, acceleration latency matching bare metal
+
+**Section 4.6 (低延迟配置)**:
+- Added 场景三 (Volcengine edge high-perf VM) configuration stack alongside existing 场景一/二
+
+**Section 3.4 (技术现状总结表)**:
+- Added rows for 阿里 PV Timer and Volcengine 边缘高性能 VM
+
+**See also**: Added concept-exitless-timer and three new source page links
+
+## [2026-04-14] create | Timer VM Exit 优化方案综述
+
+Created a new standalone survey page synthesizing all Timer-caused VM Exit optimization approaches:
+
+**New analysis page:**
+- [analysis-timer-vmexit-optimization-survey](analyses/analysis-timer-vmexit-optimization-survey.md) — Comprehensive survey covering: problem definition with production kvm_stat data, 10-stage optimization evolution (tickless → TSC-deadline → preemption timer → posted timer interrupt → adaptive advance → MSR bitmap → kvmclock → HLT-in-guest → Timer Passthrough → NoExit PVIPI), side-by-side comparison of Tencent/Alibaba/ByteDance exit-less timer approaches, KVM timer data structures and code paths, Volcengine production deployment results, and future directions (hardware evolution, CoCo challenges, security attack surface)
+
+**Updated:**
+- [index.md](index.md) — Added new analysis page entry

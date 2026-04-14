@@ -1,9 +1,9 @@
 ---
 type: entity
 created: 2026-04-09
-updated: 2026-04-09
-sources: [mastering-kvm-virtualization]
-tags: [kvm, performance, numa, hugepages, ksm, cpu-pinning, tuning]
+updated: 2026-04-10
+sources: [mastering-kvm-virtualization, lcna-co2012-sekiyama, all-solution-vmexit, bytedance-solution-vmexit]
+tags: [kvm, performance, numa, hugepages, ksm, cpu-pinning, cpu-isolation, tuning, exitless-timer, nohz-full, dynamic-isolation]
 ---
 
 # KVM Performance Tuning
@@ -28,6 +28,10 @@ CPU pinning binds virtual CPUs to specific physical CPUs, reducing cache misses 
 **Emulator pinning** (`emulatorpin`) pins the QEMU emulator process to a dedicated core, preventing it from competing with guest vCPUs. **IOThread pinning** (`iothreadpin`) pins I/O handler threads to specific cores, isolating disk I/O processing.
 
 **Best practices**: pin all vCPUs, emulator, and IOThreads to cores on the **same NUMA node**. Use dedicated physical CPUs per guest; avoid overcommitting pinned cores. Verify with `virsh vcpuinfo <domain>`.
+
+### CPU Isolation (Extreme RT Mode)
+
+For real-time workloads requiring bare-metal interrupt latency, CPU pinning alone is insufficient — host kernel threads, softirqs, and timer ticks still interfere. Sekiyama (Hitachi, LinuxCon 2012) proposed **full CPU isolation** by taking CPUs offline from the host and dedicating them exclusively to guest vCPUs via `KVM_SET_SLAVE_CPU`. The dedicated CPU runs only the vCPU with minimal hypervisor intervention, enabling direct interrupt delivery without VM Exits (see [kvm-interrupt-virtualization](kvm-interrupt-virtualization.md)). This approach achieves bare-metal interrupt latency but sacrifices CPU overcommitment — it is suited only for RT/embedded scenarios where latency guarantees outweigh resource efficiency. For a softer variant, combine `isolcpus` + `nohz_full` kernel parameters with standard vCPU pinning.
 
 ## NUMA Tuning
 

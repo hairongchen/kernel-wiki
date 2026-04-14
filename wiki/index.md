@@ -1,7 +1,7 @@
 ---
 type: index
 created: 2026-04-08
-updated: 2026-04-09
+updated: 2026-04-14
 ---
 
 # Wiki Index
@@ -22,6 +22,11 @@ Content catalog for the Kernel Wiki. Organized by page type.
 - [src-qemu-kvm-source-code-and-application](sources/src-qemu-kvm-source-code-and-application.md) — Li Qiang (QEMU 2.8.1 / Linux 4.4.161, QEMU/KVM source-code-level analysis: CPU/memory/interrupt/IO virtualization)
 - [src-mastering-kvm-virtualization](sources/src-mastering-kvm-virtualization.md) — Chirammal, Mukhedkar, Vettathu (KVM operations: libvirt management, networking, storage, migration, performance tuning)
 - [src-debugging-with-gdb](sources/src-debugging-with-gdb.md) — Stallman, Pesch, Shebs (GDB 7.6.50, Tenth Edition: complete debugger reference — breakpoints, watchpoints, tracepoints, reverse debugging, remote debugging, Python API, GDB/MI)
+- [src-lcna-co2012-sekiyama](sources/src-lcna-co2012-sekiyama.md) — Sekiyama (LinuxCon 2012, Hitachi: real-time KVM performance via CPU isolation, direct interrupt delivery, direct EOI)
+- [src-minimizing-vmexits-pv-ipi-passthrough-timer](sources/src-minimizing-vmexits-pv-ipi-passthrough-timer.md) — Huaqiao & Zhou (ByteDance ~2020: timer passthrough, NoExit PVIPI for zero-VM-Exit timer and IPI paths)
+- [src-all-solution-vmexit](sources/src-all-solution-vmexit.md) — @惠伟 (Zhihu: timer VM Exit diagnosis via kvm_stat, comparison of Tencent/Alibaba/ByteDance exit-less timer solutions)
+- [src-bytedance-solution-vmexit](sources/src-bytedance-solution-vmexit.md) — Fu Qiuwei, Volcengine/ByteDance (InfoQ 2024-12: edge high-perf VM with interrupt non-exit, timer passthrough, VFIO bypass, IPI fastpath, dynamic isolation)
+- [src-bytedance-solution-vmexit-code](sources/src-bytedance-solution-vmexit-code.md) — dengqiao.joey, Yang Zhang, ByteDance (RFC patch 2020-09: Passthrough IPI implementation, pi_desc exposure to guest, 7K→2K cycle IPI)
 
 ## Entities
 
@@ -121,6 +126,7 @@ Content catalog for the Kernel Wiki. Organized by page type.
 - [concept-hardware-virtualization](concepts/concept-hardware-virtualization.md) — Hardware virtualization: VT-x/VMX, Type 1 vs Type 2 hypervisors, EPT, APICv, progressive VM Exit elimination
 - [concept-virtio-data-plane](concepts/concept-virtio-data-plane.md) — Virtio data plane optimization: control vs data plane, IOThread, vhost kernel offloading, device passthrough
 - [concept-reverse-debugging](concepts/concept-reverse-debugging.md) — Reverse debugging: process record/replay, reverse execution commands, checkpoints, hardware-assisted tracing
+- [concept-exitless-timer](concepts/concept-exitless-timer.md) — Exit-less timer: three vendor approaches (Tencent/Alibaba/ByteDance) to eliminating timer VM Exits in KVM
 
 ## Comparisons
 
@@ -134,3 +140,5 @@ Content catalog for the Kernel Wiki. Organized by page type.
 - [analysis-interrupt-delivery-process-zh](analyses/analysis-interrupt-delivery-process-zh.md) — 中断传递流程（中文版）：LAPIC 接受、IRR/ISR/PPR 过滤、运行与停机 CPU 场景、IPI 唤醒、C-state 退出延迟
 - [vfio-device-passthrough](analyses/vfio-device-passthrough.md) — VFIO framework, IOMMU groups, DMA/interrupt remapping, PCI/SR-IOV device passthrough to KVM guests
 - [vfio-device-passthrough-zh](analyses/vfio-device-passthrough-zh.md) — VFIO 与 IOMMU 设备直通（中文版）：IOMMU 组、DMA/中断重映射、PCI/SR-IOV 设备直通
+- [analysis-vm-exit-reduction-and-timer-virtualization](analyses/analysis-vm-exit-reduction-and-timer-virtualization.md) — VM Exit 消除发展历程与 Timer 虚拟化优化：五代硬件演进、Timer VM Exit 三大来源、六阶段优化技术、未来展望
+- [analysis-timer-vmexit-optimization-survey](analyses/analysis-timer-vmexit-optimization-survey.md) — Timer VM Exit 优化方案综述：十项优化技术演进、三家厂商 Exit-less Timer 对比、Volcengine 生产实践、未来展望

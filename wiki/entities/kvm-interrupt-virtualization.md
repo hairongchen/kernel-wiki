@@ -1,9 +1,9 @@
 ---
 type: entity
 created: 2026-04-09
-updated: 2026-04-09
-sources: [qemu-kvm-source-code-and-application]
-tags: [kvm, interrupt-virtualization, apicv, posted-interrupts, pic, ioapic, lapic, msi]
+updated: 2026-04-10
+sources: [qemu-kvm-source-code-and-application, lcna-co2012-sekiyama, minimizing-vmexits-pv-ipi-passthrough-timer, all-solution-vmexit, bytedance-solution-vmexit, bytedance-solution-vmexit-code]
+tags: [kvm, interrupt-virtualization, apicv, posted-interrupts, pic, ioapic, lapic, msi, direct-interrupt-delivery, pv-ipi, exitless-timer, ipi-fastpath]
 ---
 
 # KVM Interrupt Virtualization
@@ -218,9 +218,91 @@ The following summarizes the path from device to guest for each mechanism:
 - **APICv path**: Device → `vmx_deliver_posted_interrupt()` → `pi_desc.pir[]` → hardware merges to VIRR → automatic guest delivery (no VM Exit).
 - **IRQfd path**: eventfd signal → `kvm_set_irq()` → GSI routing → appropriate controller → guest delivery.
 
+## Direct Interrupt Delivery (CPU Isolation Approach)
+
+An alternative to APICv for eliminating interrupt VM Exits, proposed by Tomoki Sekiyama (Hitachi, LinuxCon 2012). This approach trades CPU overcommitment for zero-VM-Exit interrupt delivery by dedicating physical CPUs to guest VMs.
+
+### Mechanism
+
+The key is clearing the **"External interrupt exiting" bit** (bit 0) in the VMCS Pin-Based VM-Execution Controls. When this bit is 0, external interrupts are delivered directly through the guest IDT instead of causing VM Exits. This requires **CPU isolation** — the dedicated CPU is taken offline from the host (`echo 0 > /sys/devices/system/cpu/cpuX/online`) and bound to a specific vCPU via the `KVM_SET_SLAVE_CPU` ioctl.
+
+### Issues and Solutions
+
+**Host vs. guest interrupt disambiguation:** With external interrupt exiting disabled, all interrupts on that CPU go to the guest. Solution: use IRQ affinity to route host device interrupts to host cores and passed-through device interrupts (MSI/MSI-X only) to dedicated guest cores.
+
+**Host-to-guest IPI delivery:** The host still needs to send IPIs to dedicated CPUs for virtual IRQ injection and TLB shootdowns, but those IPIs would be delivered to the guest. Solution: use NMI instead of normal IPI — NMI exiting is controlled by a separate VMCS bit (bit 3). The NMI merely causes a VM Exit, after which the host processes the pending request.
+
+**Vector mismatch:** Host and guest use different vector numbers for the same passed-through device. With direct delivery, the PCI device must be reconfigured to use the guest's vector. During VM Exit periods, the host registers the guest's vector→IRQ mapping in its own IDT on the dedicated CPU, so any interrupt received with the guest's vector is correctly forwarded as a vIRQ.
+
+### Direct EOI via x2APIC
+
+With x2APIC hardware, the guest can perform EOI directly via MSR access by exposing the EOI MSR through the VMCS MSR bitmap. Direct EOI must be temporarily disabled when a virtual IRQ is injected (the EOI must go to the emulated APIC), and re-enabled after the virtual IRQ is handled.
+
+### Flow Comparison
+
+- **Normal KVM:** interrupt → VM Exit → host IRQ handler → vIRQ injection → VM Enter → guest IRQ handler → EOI → VM Exit → APIC emulation → VM Enter (3 exit/entry pairs)
+- **Direct delivery + direct EOI:** interrupt → guest IRQ handler → direct EOI (0 VM Exits)
+
+This approach is suitable for real-time and embedded scenarios where CPUs can be dedicated, but not for overcommitted cloud environments. APICv provides a more general solution that works without CPU dedication.
+
+## NoExit PV IPI (Posted-Interrupt IPI Passthrough)
+
+A more aggressive optimization proposed by Huaqiao & Yibo Zhou (ByteDance, ~2020) that eliminates IPI VM Exits entirely by exposing the posted-interrupt hardware to the guest. This extends the upstream PV IPI mechanism (by Wanpeng Li, Tencent) which still requires one VM Exit per hypercall.
+
+### Background: IPI VM Exit Overhead
+
+In large VMs (72-104 vCPUs), IPI traffic is substantial — 250K-550K IPI-caused VM Exits per 5-minute window. Each IPI via the standard path costs ~11,486 CPU cycles due to VM Exit/Entry overhead. The upstream PV IPI (`KVM_HC_SEND_IPI` hypercall) batches IPIs via a bitmap in a single hypercall but still requires one VM Exit per batch.
+
+### Mechanism
+
+NoExit PVIPI passes through the posted-interrupt descriptor (`pi_desc`) to the guest and removes MSR.ICR interception:
+
+1. The host maps each vCPU's `pi_desc` address into guest-accessible memory
+2. The VMCS MSR bitmap is configured to **not intercept** writes to the ICR MSR
+3. The guest sends IPIs directly using the posted-interrupt hardware path
+
+**Guest-side IPI flow** (vcpu0 sending IPI to vcpu1):
+
+```
+1. Get the pi_desc of target vcpu1 (from shared memory)
+2. atomic_test_and_set PIR[vector]          -- set the interrupt request bit
+3. atomic_test_and_set pi_desc.ON           -- set outstanding notification flag
+4. Read NV from pi_desc.NV                  -- get notification vector
+5. Prepare ICR with NV and destination APIC ID
+6. wrmsr ICR                                -- hardware sends notification IPI
+```
+
+The target CPU's posted-interrupt processing hardware automatically merges the PIR bits into the virtual-APIC page and delivers the interrupt — all without any VM Exit on either the sender or receiver side.
+
+**Fallback for special interrupts:** A new `MSR_KVM_PV_ICR` MSR is provided for interrupt types that still need VMM mediation (SMI, NMI, SIPI, etc.). Guest writes to this MSR do cause a VM Exit.
+
+### Performance
+
+On Intel Xeon Gold 5218 @ 2.30GHz:
+- Single IPI cost: bare-metal **228 cycles**, vanilla VM **11,486 cycles**, NoExit PVIPI **412 cycles** (96.4% reduction, only 1.8x bare-metal)
+- memcached throughput: +14.8% improvement
+
+### Security Considerations
+
+Exposing `pi_desc` to the guest creates a potential attack surface — a malicious guest could manipulate another guest's pi_desc. Future work proposes security hardening via EPTP Switch (VMFUNC) to restrict pi_desc access.
+
+## Interrupt Delivery Summary
+
+The following summarizes the path from device to guest for each mechanism:
+
+- **PIC path**: Device → `kvm_pic_set_irq()` → IRR/ISR → `kvm_cpu_get_interrupt()` → VMCS injection.
+- **I/O APIC path**: Device → `ioapic_set_irq()` → `ioapic_service()` → `kvm_irq_delivery_to_apic()` → LAPIC IRR → VMCS injection.
+- **MSI path**: Device → `msi_notify()` → `kvm_set_msi()` → LAPIC IRR → VMCS injection.
+- **APICv path**: Device → `vmx_deliver_posted_interrupt()` → `pi_desc.pir[]` → hardware merges to VIRR → automatic guest delivery (no VM Exit).
+- **IRQfd path**: eventfd signal → `kvm_set_irq()` → GSI routing → appropriate controller → guest delivery.
+- **Direct delivery path** (CPU isolation): Device MSI → dedicated CPU IDT → guest IRQ handler → direct EOI (0 VM Exits).
+- **NoExit PVIPI path**: Guest `wrmsr ICR` → hardware posted-interrupt → target vCPU VIRR (0 VM Exits).
+
 ## See also
 
 - [kvm-cpu-virtualization](kvm-cpu-virtualization.md)
 - [virtio-framework](virtio-framework.md)
 - [vhost](vhost.md)
 - [interrupt-handling](interrupt-handling.md)
+- [kvm-performance-tuning](kvm-performance-tuning.md)
+- [analysis-vm-exit-reduction-and-timer-virtualization](../analyses/analysis-vm-exit-reduction-and-timer-virtualization.md)
