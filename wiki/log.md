@@ -280,3 +280,38 @@ Not fixed (accepted):
 - 4 over-length analysis pages (337-438 lines) — analyses are long by nature
 
 Post-fix verification: 0 broken links, 0 orphan pages, 0 missing frontmatter fields.
+
+## [2026-04-10] create | Comparison: Emulated PMU vs Mediated PMU
+
+Created a new comparison page analyzing the two KVM vPMU architectures: the traditional perf-based Emulated PMU and the newer Mediated PMU with direct hardware counter access. Based on existing wiki sources and Sean Christopherson's mediated PMU patch series (`vmx/mediated_pmu_freeze_in_smm` branch, lore: `20260207041011.913471-*-seanjc@google.com`).
+
+**New comparison page:**
+- [cmp-emulated-vs-mediated-pmu](comparisons/cmp-emulated-vs-mediated-pmu.md) — Side-by-side analysis covering: core mechanism (perf events vs direct MSR load/store), VM-Exit overhead (full intercept vs MSR passthrough), counter accuracy, host-guest PMU coexistence, event filter enforcement, hardware requirements (PMU v4+, full-width writes), context switch cost, nested virtualization implications, and placement within the hardware virtualization trajectory (EPT → APICv → VT-d → Mediated PMU)
+
+**Updated:**
+- [index.md](index.md) — Added comparison page entry
+
+## [2026-04-10] create | Chinese version of Emulated vs Mediated PMU comparison
+
+Created a Chinese translation of the Emulated vs Mediated PMU comparison page.
+
+**New comparison page:**
+- [cmp-emulated-vs-mediated-pmu-zh](comparisons/cmp-emulated-vs-mediated-pmu-zh.md) — 模拟 PMU 与中介 PMU 对比分析（中文版）：核心机制、VM-Exit 开销、计数精度、宿主-客户共存、事件过滤、硬件要求、上下文切换成本
+
+**Updated:**
+- [index.md](index.md) — Added Chinese comparison page entry
+- [cmp-emulated-vs-mediated-pmu](comparisons/cmp-emulated-vs-mediated-pmu.md) — Added cross-link to Chinese version
+
+## [2026-04-10] create | KVM PMU Virtualization entity page
+
+Created a comprehensive entity page covering KVM PMU virtualization architecture, data structures, and implementation details for both emulated and mediated modes. Based on Sean Christopherson's `vmx/mediated_pmu_freeze_in_smm` branch code.
+
+**New entity page:**
+- [kvm-pmu-virtualization](entities/kvm-pmu-virtualization.md) — KVM vPMU architecture: `struct kvm_pmc` (per-counter state with emulated_counter/perf_event for emulated, direct counter for mediated), `struct kvm_pmu` (per-vCPU PMU state), `struct kvm_pmu_ops` (vendor dispatch with mediated_load/put/write_global_ctrl callbacks), capability detection (`kvm_init_pmu_capability`), MSR handling (counter read/write path divergence), MSR intercept configuration (passthrough table for mediated mode), counter reprogramming (`reprogram_counter` vs `kvm_mediated_pmu_refresh_event_filter`), emulated instruction counting, context switch flows (load/put with `perf_load/put_guest_context`), PMI delivery paths, event filtering, PEBS support, module parameters
+
+**Updated:**
+- [index.md](index.md) — Added entity page under new PMU section
+- [overview.md](overview.md) — Added PMU virtualization coverage, updated page counts and gaps
+- [kvm-cpu-virtualization](entities/kvm-cpu-virtualization.md) — Added cross-link to PMU page
+- [concept-hardware-virtualization](concepts/concept-hardware-virtualization.md) — Added Generation 5 (Mediated PMU) to VM-Exit elimination trajectory, added cross-link
+- [cmp-emulated-vs-mediated-pmu](comparisons/cmp-emulated-vs-mediated-pmu.md) — Added cross-link to entity page

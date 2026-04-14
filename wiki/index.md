@@ -49,6 +49,9 @@ Content catalog for the Kernel Wiki. Organized by page type.
 ### Concurrency
 - [pthreads](entities/pthreads.md) — POSIX threads: creation, synchronization (mutexes, semaphores, condition variables), cancellation, TSD
 
+### PMU (Performance Monitoring)
+- [kvm-pmu-virtualization](entities/kvm-pmu-virtualization.md) — KVM PMU virtualization: kvm_pmu/kvm_pmc structures, emulated vs mediated modes, MSR handling, counter reprogramming, PMI delivery
+
 ### Virtualization and Isolation
 - [namespaces](entities/namespaces.md) — Linux namespaces: nsproxy, PID/UTS/IPC/mount/network/user namespaces, CLONE_NEW* flags, container building blocks
 - [qemu-kvm-overview](entities/qemu-kvm-overview.md) — QEMU/KVM architecture: QOM type system, QDev device model, event loop, HMP/QMP monitor, thread model
@@ -122,6 +125,8 @@ Content catalog for the Kernel Wiki. Organized by page type.
 ## Comparisons
 
 - [cmp-slab-slub-slob](comparisons/cmp-slab-slub-slob.md) -- SLAB vs SLUB vs SLOB: trade-offs between the three Linux kernel slab allocator implementations
+- [cmp-emulated-vs-mediated-pmu](comparisons/cmp-emulated-vs-mediated-pmu.md) -- Emulated PMU vs Mediated PMU: perf-based emulation vs direct hardware counter access in KVM
+- [cmp-emulated-vs-mediated-pmu-zh](comparisons/cmp-emulated-vs-mediated-pmu-zh.md) -- 模拟 PMU 与中介 PMU 对比分析（中文版）
 
 ## Analyses
 

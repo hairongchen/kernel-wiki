@@ -248,4 +248,5 @@ This cycle repeats millions of times per second during normal guest operation. T
 - [qemu-kvm-overview](qemu-kvm-overview.md) -- Overall QEMU/KVM architecture
 - [kvm-memory-virtualization](kvm-memory-virtualization.md) -- EPT, shadow page tables, memory region management
 - [kvm-interrupt-virtualization](kvm-interrupt-virtualization.md) -- APIC virtualization, interrupt injection, SIPI
+- [kvm-pmu-virtualization](kvm-pmu-virtualization.md) -- PMU virtualization: emulated and mediated modes, counter management
 - [qemu-machine-emulation](qemu-machine-emulation.md) -- Machine types, device emulation, QOM

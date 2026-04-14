@@ -145,9 +145,10 @@ Generation 1: VT-x/AMD-V     -- CPU virtualization (eliminate binary translation
 Generation 2: EPT/NPT         -- Memory virtualization (eliminate shadow page tables)
 Generation 3: APICv/AVIC      -- Interrupt virtualization (eliminate interrupt interception)
 Generation 4: VT-d/IOMMU      -- I/O virtualization (eliminate device emulation)
+Generation 5: Mediated PMU    -- PMU virtualization (eliminate perf counter emulation)
 ```
 
-The end state approaches bare-metal performance: the guest runs on the CPU with hardware-enforced isolation, hardware-translated memory, hardware-delivered interrupts, and direct hardware device access. The hypervisor only intervenes for management operations and resource allocation, not for the data path.
+The end state approaches bare-metal performance: the guest runs on the CPU with hardware-enforced isolation, hardware-translated memory, hardware-delivered interrupts, direct hardware device access, and direct PMU counter access. The hypervisor only intervenes for management operations and resource allocation, not for the data path. See [cmp-emulated-vs-mediated-pmu](../comparisons/cmp-emulated-vs-mediated-pmu.md) for a detailed comparison of the emulated and mediated PMU approaches.
 
 ## See also
 
@@ -155,4 +156,5 @@ The end state approaches bare-metal performance: the guest runs on the CPU with 
 - [kvm-cpu-virtualization](../entities/kvm-cpu-virtualization.md)
 - [kvm-memory-virtualization](../entities/kvm-memory-virtualization.md)
 - [kvm-interrupt-virtualization](../entities/kvm-interrupt-virtualization.md)
+- [kvm-pmu-virtualization](../entities/kvm-pmu-virtualization.md)
 - [vfio-device-passthrough](../analyses/vfio-device-passthrough.md)
