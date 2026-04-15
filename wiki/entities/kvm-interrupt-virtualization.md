@@ -1,8 +1,8 @@
 ---
 type: entity
 created: 2026-04-09
-updated: 2026-04-10
-sources: [qemu-kvm-source-code-and-application, lcna-co2012-sekiyama, minimizing-vmexits-pv-ipi-passthrough-timer, all-solution-vmexit, bytedance-solution-vmexit, bytedance-solution-vmexit-code]
+updated: 2026-04-11
+sources: [qemu-kvm-source-code-and-application, lcna-co2012-sekiyama, minimizing-vmexits-pv-ipi-passthrough-timer, all-solution-vmexit, bytedance-solution-vmexit, bytedance-solution-vmexit-code, vmexit-opt-hitachi-sekiyama]
 tags: [kvm, interrupt-virtualization, apicv, posted-interrupts, pic, ioapic, lapic, msi, direct-interrupt-delivery, pv-ipi, exitless-timer, ipi-fastpath]
 ---
 
@@ -208,16 +208,6 @@ IOeventfd is heavily used for [virtio-framework](virtio-framework.md) doorbell n
 
 Together, IRQfd and IOeventfd form the fast-path interrupt and notification mechanism that makes [vhost](vhost.md) possible, keeping both interrupt injection and doorbell notifications entirely within the host kernel.
 
-## Interrupt Delivery Summary
-
-The following summarizes the path from device to guest for each mechanism:
-
-- **PIC path**: Device → `kvm_pic_set_irq()` → IRR/ISR → `kvm_cpu_get_interrupt()` → VMCS injection.
-- **I/O APIC path**: Device → `ioapic_set_irq()` → `ioapic_service()` → `kvm_irq_delivery_to_apic()` → LAPIC IRR → VMCS injection.
-- **MSI path**: Device → `msi_notify()` → `kvm_set_msi()` → LAPIC IRR → VMCS injection.
-- **APICv path**: Device → `vmx_deliver_posted_interrupt()` → `pi_desc.pir[]` → hardware merges to VIRR → automatic guest delivery (no VM Exit).
-- **IRQfd path**: eventfd signal → `kvm_set_irq()` → GSI routing → appropriate controller → guest delivery.
-
 ## Direct Interrupt Delivery (CPU Isolation Approach)
 
 An alternative to APICv for eliminating interrupt VM Exits, proposed by Tomoki Sekiyama (Hitachi, LinuxCon 2012). This approach trades CPU overcommitment for zero-VM-Exit interrupt delivery by dedicating physical CPUs to guest VMs.
@@ -243,7 +233,17 @@ With x2APIC hardware, the guest can perform EOI directly via MSR access by expos
 - **Normal KVM:** interrupt → VM Exit → host IRQ handler → vIRQ injection → VM Enter → guest IRQ handler → EOI → VM Exit → APIC emulation → VM Enter (3 exit/entry pairs)
 - **Direct delivery + direct EOI:** interrupt → guest IRQ handler → direct EOI (0 VM Exits)
 
-This approach is suitable for real-time and embedded scenarios where CPUs can be dedicated, but not for overcommitted cloud environments. APICv provides a more general solution that works without CPU dedication.
+### Advantages and Limitations
+
+**Advantages:** Near-bare-metal interrupt latency without requiring APICv/Posted Interrupts hardware features; host OS consumes almost zero CPU cycles on the dedicated core; well-suited for network forwarding, high-frequency trading, and industrial control.
+
+**Limitations:**
+- **Non-mainline code** — `KVM_SET_SLAVE_CPU` is a Hitachi-specific patch, not merged upstream, making long-term maintenance difficult.
+- **No overcommitment** — Each vCPU requires a dedicated physical CPU; the entire pCPU is sacrificed for a single guest.
+- **Debugging opacity** — Since interrupts bypass the host entirely, the host cannot monitor or intervene in the guest's interrupt state, making diagnosis of guest-internal interrupt issues very difficult.
+- **System hang risk** — Precise IRQ affinity configuration is critical; if host device interrupts are accidentally routed to the isolated CPU, they are silently ignored by the guest IDT, potentially causing **host system hangs**.
+
+This approach is suitable for real-time and embedded scenarios where CPUs can be dedicated, but not for overcommitted cloud environments. APICv provides a more general solution that works without CPU dedication. Historically, this scheme served as the **software predecessor** to APICv — its design principles (CPU isolation + direct delivery + NMI fallback) directly foreshadow the hardware-assisted interrupt delivery that followed.
 
 ## NoExit PV IPI (Posted-Interrupt IPI Passthrough)
 

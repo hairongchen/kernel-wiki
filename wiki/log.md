@@ -225,7 +225,7 @@ Created a new comparison page analyzing the trade-offs between the three Linux k
 Created a new entity page covering VFIO and IOMMU-based device passthrough for KVM guests. Fills the gap identified in overview.md for VFIO/device passthrough details.
 
 **New entity page:**
-- [vfio-device-passthrough](analyses/vfio-device-passthrough.md) — IOMMU hardware (VT-d/AMD-Vi), DMA remapping, interrupt remapping, IOMMU groups, VFIO kernel framework (container/group/device hierarchy), QEMU integration (DMA mapping, BAR exposure, irqfd interrupts), SR-IOV passthrough (PF/VF), security model, trade-offs
+- [vfio-device-passthrough](analyses/analysis-vfio-device-passthrough.md) — IOMMU hardware (VT-d/AMD-Vi), DMA remapping, interrupt remapping, IOMMU groups, VFIO kernel framework (container/group/device hierarchy), QEMU integration (DMA mapping, BAR exposure, irqfd interrupts), SR-IOV passthrough (PF/VF), security model, trade-offs
 
 **Updated:**
 - [index.md](index.md) — Added entity page entry
@@ -260,11 +260,11 @@ Created a Chinese translation of the interrupt delivery process analysis page.
 Created a Chinese translation of the VFIO/IOMMU device passthrough entity page.
 
 **New entity page:**
-- [vfio-device-passthrough-zh](analyses/vfio-device-passthrough-zh.md) — VFIO 与 IOMMU 设备直通（中文版）
+- [vfio-device-passthrough-zh](analyses/analysis-vfio-device-passthrough-zh.md) — VFIO 与 IOMMU 设备直通（中文版）
 
 **Updated:**
 - [index.md](index.md) — Added Chinese entity entry
-- [vfio-device-passthrough](analyses/vfio-device-passthrough.md) — Added cross-link to Chinese version
+- [vfio-device-passthrough](analyses/analysis-vfio-device-passthrough.md) — Added cross-link to Chinese version
 
 ## [2026-04-10] move | vfio-device-passthrough to analyses
 
@@ -437,3 +437,61 @@ Created a new standalone survey page synthesizing all Timer-caused VM Exit optim
 
 **Updated:**
 - [index.md](index.md) — Added new analysis page entry
+
+## [2026-04-11] ingest | VMExit_opt_Hitachi_Sekiyama.md
+
+Ingested a Chinese-language technical analysis of Sekiyama's 2012 Hitachi direct interrupt delivery scheme. This is a secondary analysis of the same work already covered by `src-lcna-co2012-sekiyama` (original LinuxCon slides), but adds an explicit six-step construction, a comparison table, and a detailed pros/cons evaluation highlighting disadvantages not captured in the original source.
+
+**Source summary created:**
+- [src-vmexit-opt-hitachi-sekiyama](sources/src-vmexit-opt-hitachi-sekiyama.md) — Chinese-language analysis: six-step direct interrupt delivery construction (CPU isolation → KVM_SET_SLAVE_CPU → disable external interrupt exiting → IRQ routing → NMI fallback → direct EOI), comparison table, pros/cons (debugging opacity, system hang risk from IRQ misconfiguration), framing as APICv software predecessor
+
+**Entity pages updated:**
+- [kvm-interrupt-virtualization](entities/kvm-interrupt-virtualization.md) — Added "Advantages and Limitations" subsection to Direct Interrupt Delivery section: non-mainline code, no overcommitment, debugging opacity, system hang risk from IRQ misrouting. Added historical positioning as APICv software predecessor. Added new source to frontmatter
+
+**Updated:**
+- [index.md](index.md) — Added new source summary entry
+
+## [2026-04-11] create | 直接中断投递深度分析 (Sekiyama)
+
+Created a dedicated analysis page providing a comprehensive deep-dive into Sekiyama's direct interrupt delivery approach.
+
+**New analysis page:**
+- [analysis-direct-interrupt-delivery-sekiyama](analyses/analysis-direct-interrupt-delivery-sekiyama.md) — Six-section analysis: (1) problem definition with 3-VM-Exit interrupt path ASCII diagram, (2) six-step construction with ASCII architecture diagrams (CPU isolation → KVM_SET_SLAVE_CPU → disable external interrupt exiting → IRQ routing → NMI fallback → direct EOI), (3) interrupt path comparison table (traditional vs Sekiyama vs APICv), (4) detailed pros/cons (debugging opacity, system hang risk, no overcommit, non-mainline), (5) target scenarios (factory automation, embedded, trading, HPC), (6) historical positioning as APICv software predecessor with design-pattern continuity table (CPU isolation → nohz_full, direct delivery → posted interrupts, NMI fallback → IPI-as-NMI)
+
+**Updated:**
+- [index.md](index.md) — Added new analysis page entry
+
+## [2026-04-11] lint | Health check and fixes
+
+Ran full wiki health check (89 pages). Found and fixed 4 issues:
+
+**HIGH — Duplicate section removed:**
+- [kvm-interrupt-virtualization](entities/kvm-interrupt-virtualization.md) — Removed duplicate "Interrupt Delivery Summary" section at line 211 (5 paths). The authoritative version at line 299 (7 paths, including Direct delivery and NoExit PVIPI) is retained. Page dropped from 318 → 308 lines.
+
+**MEDIUM — Analysis pages renamed to follow `analysis-<name>.md` convention:**
+- `analyses/vfio-device-passthrough.md` → `analyses/analysis-vfio-device-passthrough.md`
+- `analyses/vfio-device-passthrough-zh.md` → `analyses/analysis-vfio-device-passthrough-zh.md`
+- Updated all inbound links (10 files: index.md, concept-virtio-data-plane.md, concept-hardware-virtualization.md, src-bytedance-solution-vmexit.md, kvm-networking.md, analysis-vm-exit-reduction-and-timer-virtualization.md ×2, analysis-timer-vmexit-optimization-survey.md, analysis-vfio-device-passthrough.md, analysis-vfio-device-passthrough-zh.md)
+
+**LOW — Overview count corrected:**
+- [overview.md](overview.md) — "five specialized articles" → "six specialized articles", added mention of the Sekiyama analysis source
+
+## [2026-04-11] lint | Health check and fixes (second pass)
+
+Ran full wiki health check (101 pages). Found and fixed 5 issues:
+
+**HIGH — Orphan analysis page integrated:**
+- `analyses/epyc_based_kernel_lapic_time_analyze.md` → `analyses/analysis-epyc-lapic-timer.md` — Renamed to follow `analysis-<name>.md` convention, added YAML frontmatter (type, created, updated, sources, tags), added to index.md
+
+**MEDIUM — 3 broken links in log.md fixed:**
+- Line 228: `analyses/vfio-device-passthrough.md` → `analyses/analysis-vfio-device-passthrough.md`
+- Line 263: `analyses/vfio-device-passthrough-zh.md` → `analyses/analysis-vfio-device-passthrough-zh.md`
+- Line 267: `analyses/vfio-device-passthrough.md` → `analyses/analysis-vfio-device-passthrough.md`
+
+**LOW — Standardized `title` field in 3 source files:**
+- [src-all-solution-vmexit](sources/src-all-solution-vmexit.md) — Added `title` field
+- [src-bytedance-solution-vmexit](sources/src-bytedance-solution-vmexit.md) — Added `title` field
+- [src-bytedance-solution-vmexit-code](sources/src-bytedance-solution-vmexit-code.md) — Added `title` field
+
+**Noted (not fixed):**
+- 10 pages exceed 300-line guideline (largest: 766 lines). Analysis pages are long by nature; splitting deferred

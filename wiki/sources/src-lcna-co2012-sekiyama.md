@@ -112,6 +112,8 @@ With x2APIC hardware, the guest can perform End-Of-Interrupt directly via MSR ac
 
 ## See also
 
+- [analysis-direct-interrupt-delivery-sekiyama](../analyses/analysis-direct-interrupt-delivery-sekiyama.md)
+- [src-vmexit-opt-hitachi-sekiyama](src-vmexit-opt-hitachi-sekiyama.md)
 - [kvm-interrupt-virtualization](../entities/kvm-interrupt-virtualization.md)
 - [kvm-cpu-virtualization](../entities/kvm-cpu-virtualization.md)
 - [kvm-performance-tuning](../entities/kvm-performance-tuning.md)

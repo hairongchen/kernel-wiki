@@ -334,4 +334,4 @@ VFIO 强制要求 IOMMU 组中的所有设备必须由 VFIO（或已知安全的
 - [kvm-performance-tuning](../entities/kvm-performance-tuning.md)
 - [concept-hardware-virtualization](../concepts/concept-hardware-virtualization.md)
 - [concept-virtio-data-plane](../concepts/concept-virtio-data-plane.md)
-- [vfio-device-passthrough](vfio-device-passthrough.md) — English version
+- [analysis-vfio-device-passthrough](analysis-vfio-device-passthrough.md) — English version

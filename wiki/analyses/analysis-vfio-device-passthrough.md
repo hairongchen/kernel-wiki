@@ -334,4 +334,4 @@ VFIO enforces that all devices in an IOMMU group must be controlled by VFIO (or 
 - [kvm-performance-tuning](../entities/kvm-performance-tuning.md)
 - [concept-hardware-virtualization](../concepts/concept-hardware-virtualization.md)
 - [concept-virtio-data-plane](../concepts/concept-virtio-data-plane.md)
-- [vfio-device-passthrough-zh](vfio-device-passthrough-zh.md) — Chinese version / 中文版
+- [analysis-vfio-device-passthrough-zh](analysis-vfio-device-passthrough-zh.md) — Chinese version / 中文版

@@ -1,7 +1,7 @@
 ---
 type: index
 created: 2026-04-08
-updated: 2026-04-14
+updated: 2026-04-11
 ---
 
 # Wiki Index
@@ -27,6 +27,7 @@ Content catalog for the Kernel Wiki. Organized by page type.
 - [src-all-solution-vmexit](sources/src-all-solution-vmexit.md) — @惠伟 (Zhihu: timer VM Exit diagnosis via kvm_stat, comparison of Tencent/Alibaba/ByteDance exit-less timer solutions)
 - [src-bytedance-solution-vmexit](sources/src-bytedance-solution-vmexit.md) — Fu Qiuwei, Volcengine/ByteDance (InfoQ 2024-12: edge high-perf VM with interrupt non-exit, timer passthrough, VFIO bypass, IPI fastpath, dynamic isolation)
 - [src-bytedance-solution-vmexit-code](sources/src-bytedance-solution-vmexit-code.md) — dengqiao.joey, Yang Zhang, ByteDance (RFC patch 2020-09: Passthrough IPI implementation, pi_desc exposure to guest, 7K→2K cycle IPI)
+- [src-vmexit-opt-hitachi-sekiyama](sources/src-vmexit-opt-hitachi-sekiyama.md) — Chinese-language analysis of Sekiyama's direct interrupt delivery (CPU isolation + VMCS external-interrupt-exiting disable + NMI fallback + direct EOI), with explicit pros/cons evaluation
 
 ## Entities
 
@@ -138,7 +139,9 @@ Content catalog for the Kernel Wiki. Organized by page type.
 
 - [analysis-interrupt-delivery-process](analyses/analysis-interrupt-delivery-process.md) — End-to-end interrupt delivery: LAPIC acceptance, IRR/ISR/PPR filtering, running vs. halted CPU scenarios, IPI wakeup, C-state exit latency
 - [analysis-interrupt-delivery-process-zh](analyses/analysis-interrupt-delivery-process-zh.md) — 中断传递流程（中文版）：LAPIC 接受、IRR/ISR/PPR 过滤、运行与停机 CPU 场景、IPI 唤醒、C-state 退出延迟
-- [vfio-device-passthrough](analyses/vfio-device-passthrough.md) — VFIO framework, IOMMU groups, DMA/interrupt remapping, PCI/SR-IOV device passthrough to KVM guests
-- [vfio-device-passthrough-zh](analyses/vfio-device-passthrough-zh.md) — VFIO 与 IOMMU 设备直通（中文版）：IOMMU 组、DMA/中断重映射、PCI/SR-IOV 设备直通
+- [analysis-vfio-device-passthrough](analyses/analysis-vfio-device-passthrough.md) — VFIO framework, IOMMU groups, DMA/interrupt remapping, PCI/SR-IOV device passthrough to KVM guests
+- [analysis-vfio-device-passthrough-zh](analyses/analysis-vfio-device-passthrough-zh.md) — VFIO 与 IOMMU 设备直通（中文版）：IOMMU 组、DMA/中断重映射、PCI/SR-IOV 设备直通
 - [analysis-vm-exit-reduction-and-timer-virtualization](analyses/analysis-vm-exit-reduction-and-timer-virtualization.md) — VM Exit 消除发展历程与 Timer 虚拟化优化：五代硬件演进、Timer VM Exit 三大来源、六阶段优化技术、未来展望
 - [analysis-timer-vmexit-optimization-survey](analyses/analysis-timer-vmexit-optimization-survey.md) — Timer VM Exit 优化方案综述：十项优化技术演进、三家厂商 Exit-less Timer 对比、Volcengine 生产实践、未来展望
+- [analysis-direct-interrupt-delivery-sekiyama](analyses/analysis-direct-interrupt-delivery-sekiyama.md) — 直接中断投递深度分析：Sekiyama 六步构建法（CPU 隔离→VMCS 控制→IRQ 路由→NMI 回退→Direct EOI）、优缺点评估、APICv 软件先驱的历史定位
+- [analysis-epyc-lapic-timer](analyses/analysis-epyc-lapic-timer.md) — AMD EPYC 平台 LAPIC Timer 分析：Host/Guest 工作模式、三种定时模式、AMD 平台特性、性能影响与调优建议

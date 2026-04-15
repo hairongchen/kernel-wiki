@@ -4,6 +4,7 @@ created: 2026-04-10
 updated: 2026-04-10
 sources: [bytedance-solution-vmexit-code]
 tags: [vm-exit, pv-ipi, posted-interrupt, kvm, vmx, patch, pi-desc, passthrough-ipi, bytedance]
+title: "[RFC] KVM: X86: implement Passthrough IPI"
 ---
 
 # Source: [RFC] KVM: X86: implement Passthrough IPI (ByteDance Patch)

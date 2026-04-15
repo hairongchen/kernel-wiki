@@ -157,4 +157,4 @@ The end state approaches bare-metal performance: the guest runs on the CPU with 
 - [kvm-memory-virtualization](../entities/kvm-memory-virtualization.md)
 - [kvm-interrupt-virtualization](../entities/kvm-interrupt-virtualization.md)
 - [kvm-pmu-virtualization](../entities/kvm-pmu-virtualization.md)
-- [vfio-device-passthrough](../analyses/vfio-device-passthrough.md)
+- [vfio-device-passthrough](../analyses/analysis-vfio-device-passthrough.md)

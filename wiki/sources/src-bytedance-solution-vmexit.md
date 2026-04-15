@@ -4,6 +4,7 @@ created: 2026-04-10
 updated: 2026-04-10
 sources: [bytedance-solution-vmexit]
 tags: [vm-exit, edge-computing, volcengine, bytedance, timer-passthrough, ipi-fastpath, vfio, interrupt-passthrough, nohz-full, bare-metal, performance]
+title: "性能媲美裸金属，边缘场景高性能虚拟机技术揭秘"
 ---
 
 # Source: 性能媲美裸金属，边缘场景高性能虚拟机技术揭秘
@@ -156,4 +157,4 @@ Edge high-perf VM is in production on edge computing nodes. Future plans include
 - [kvm-performance-tuning](../entities/kvm-performance-tuning.md)
 - [concept-hardware-virtualization](../concepts/concept-hardware-virtualization.md)
 - [concept-virtio-data-plane](../concepts/concept-virtio-data-plane.md)
-- [vfio-device-passthrough](../analyses/vfio-device-passthrough.md)
+- [vfio-device-passthrough](../analyses/analysis-vfio-device-passthrough.md)

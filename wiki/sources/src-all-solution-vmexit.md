@@ -4,6 +4,7 @@ created: 2026-04-10
 updated: 2026-04-10
 sources: [all-solution-vmexit]
 tags: [vm-exit, timer, exitless-timer, kvm, tencent, alibaba, bytedance, lapic, tsc-deadline, posted-interrupt]
+title: "KVM Timer 导致 Exit 过多的解决办法"
 ---
 
 # Source: KVM Timer 导致 Exit 过多的解决办法

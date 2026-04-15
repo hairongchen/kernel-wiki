@@ -117,7 +117,7 @@ I/O 虚拟化的优化是一个从软件到硬件的渐进过程：
 - **irqfd**：vhost_worker 完成 I/O 后通过 eventfd 信号 KVM，KVM 直接注入中断
 - **VT-d/IOMMU**：物理设备直通给 guest，DMA 通过 IOMMU 翻译，中断直接路由到 guest
 
-详见 [concept-virtio-data-plane](../concepts/concept-virtio-data-plane.md)、[virtio-framework](../entities/virtio-framework.md)、[vhost](../entities/vhost.md) 和 [vfio-device-passthrough](vfio-device-passthrough.md)。
+详见 [concept-virtio-data-plane](../concepts/concept-virtio-data-plane.md)、[virtio-framework](../entities/virtio-framework.md)、[vhost](../entities/vhost.md) 和 [vfio-device-passthrough](analysis-vfio-device-passthrough.md)。
 
 ### 2.5 第五代：PMU 虚拟化
 
@@ -759,7 +759,7 @@ Hardware:
 - [concept-virtio-data-plane](../concepts/concept-virtio-data-plane.md)
 - [qemu-machine-emulation](../entities/qemu-machine-emulation.md)
 - [kvm-performance-tuning](../entities/kvm-performance-tuning.md)
-- [vfio-device-passthrough](vfio-device-passthrough.md)
+- [vfio-device-passthrough](analysis-vfio-device-passthrough.md)
 - [kvm-pmu-virtualization](../entities/kvm-pmu-virtualization.md)
 - [src-all-solution-vmexit](../sources/src-all-solution-vmexit.md)
 - [src-bytedance-solution-vmexit](../sources/src-bytedance-solution-vmexit.md)

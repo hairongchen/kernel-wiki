@@ -501,5 +501,5 @@ Timer Passthrough 和 NoExit PVIPI 通过下放硬件控制权消除 VM Exit，�
 - [concept-hardware-virtualization](../concepts/concept-hardware-virtualization.md) — 硬件虚拟化演进
 - [kvm-interrupt-virtualization](../entities/kvm-interrupt-virtualization.md) — KVM 中断虚拟化
 - [kvm-performance-tuning](../entities/kvm-performance-tuning.md) — KVM 性能调优
-- [vfio-device-passthrough](vfio-device-passthrough.md) — VFIO 设备直通
+- [vfio-device-passthrough](analysis-vfio-device-passthrough.md) — VFIO 设备直通
 - [timing-subsystem](../entities/timing-subsystem.md) — Linux 时间子系统
