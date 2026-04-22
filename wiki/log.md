@@ -495,3 +495,92 @@ Ran full wiki health check (101 pages). Found and fixed 5 issues:
 
 **Noted (not fixed):**
 - 10 pages exceed 300-line guideline (largest: 766 lines). Analysis pages are long by nature; splitting deferred
+
+## [2026-04-11] ingest | KVM-devirt: Zero-overhead Partition Hypervisor (KVM Forum 2022)
+
+Ingested a 19-slide presentation by Liang Deng (ByteDance STE) from KVM Forum 2022. Introduces KVM-devirt, which extends KVM into a zero-overhead partition hypervisor by eliminating all VM Exits and address translations after guest init. Six techniques: interrupt/IPI/timer passthrough, memory/DMA devirtualization, virtio notification passthrough. Benchmarks show 20-30% improvement over standard VM, within 1% of native for single partition, and 9% faster than native with 4 partitions.
+
+**Source summary created:**
+- [src-kvm-devirt-kvmforum2022](sources/src-kvm-devirt-kvmforum2022.md) — Liang Deng, ByteDance STE (KVM Forum 2022): KVM-devirt zero-overhead partition hypervisor
+
+**Entity page created:**
+- [kvm-devirt](entities/kvm-devirt.md) — KVM-devirt architecture: six passthrough/devirtualization techniques, benchmarks, platform support
+
+**Concept page created:**
+- [concept-memory-devirtualization](concepts/concept-memory-devirtualization.md) — Memory de-virtualization: PV page table interfaces (set_pgd/pte_val), gfn-to-pfn/pfn-to-gfn mapping, EPT/NPT elimination, single-level translation
+
+**Existing pages updated:**
+- [concept-hardware-virtualization](concepts/concept-hardware-virtualization.md) — Added "Beyond Hardware Assistance: KVM-devirt" subsection, updated sources and See also
+- [concept-exitless-timer](concepts/concept-exitless-timer.md) — Added KVM-devirt timer passthrough context paragraph, updated sources and See also
+- [index.md](index.md) — Added 3 new page entries (source, entity, concept)
+- [overview.md](overview.md) — Updated virtualization coverage with KVM-devirt partition hypervisor
+
+## [2026-04-11] create | KVM-devirt 深度分析
+
+Created a comprehensive analysis page synthesizing KVM-devirt with all existing wiki sources on VM Exit optimization.
+
+**New analysis page:**
+- [analysis-kvm-devirt-partition-hypervisor](analyses/analysis-kvm-devirt-partition-hypervisor.md) — Nine-section deep dive: (1) consolidation vs partitioning paradigm shift with Amdahl's Law analysis of the "faster than native" result, (2) six-technique overhead decomposition with quantified breakdown (memory devirt 14% > interrupt+IPI+timer 8%), (3) three-generation interrupt passthrough evolution (Sekiyama 2012 → Volcengine 2020 → KVM-devirt 2022), IPI passthrough dual-path comparison (NoExit PVIPI vs KVM-devirt), timer passthrough lineage, (4) memory devirtualization as key innovation: frequency×cost analysis explaining why EPT overhead > VM Exit overhead, "reverse paravirtualization" design pattern, shadow PT comparison, static memory tradeoffs, (5) KVM-devirt vs Volcengine comparison (zero overhead vs deployable transparency), (6) security model analysis (vector separation, PV page table isolation guarantees, DMA passthrough risks), (7) residual VM Exit enumeration, (8) future outlook (upstream challenges, CoCo conflicts, live migration obstacles, CXL interaction), (9) four key conclusions
+
+**Updated:**
+- [index.md](index.md) — Added analysis page entry
+
+## [2026-04-11] create | LAPIC One-shot vs TSC-Deadline 精度差别研究
+
+Created a deep-dive analysis comparing LAPIC timer one-shot mode and TSC-Deadline mode precision characteristics.
+
+**New analysis page:**
+- [analysis-lapic-oneshot-vs-tscdeadline-precision](analyses/analysis-lapic-oneshot-vs-tscdeadline-precision.md) — Nine-section analysis covering: (1) hardware working principles of both modes (bus clock decrement counter vs TSC absolute comparator), (2) quantified precision comparison (resolution 10-200x, jitter 2-5x, programming latency ~2x advantage for TSC-Deadline), (3) root cause analysis (clock domain difference: core TSC 2-5 GHz vs bus clock 100-400 MHz; absolute vs relative timing semantics; calibration error propagation), (4) Linux kernel implementation (lapic_next_event vs lapic_next_deadline, clockevents rating 100 vs 600, hrtimer integration), (5) KVM virtualization impact (VM-Exit overhead ~1μs masks ~10ns precision difference; timer passthrough restores hardware precision gap), (6) practical scenario analysis (HFT, real-time control, general server workloads), (7) why modern systems universally use TSC-Deadline
+
+**Updated:**
+- [index.md](index.md) — Added analysis page entry
+
+## [2026-04-11] create | Linux 内核中断类型总览
+
+Created a comprehensive Chinese-language analysis page classifying Linux kernel interrupt types across seven dimensions.
+
+**New analysis page:**
+- [analysis-interrupt-types-overview-zh](analyses/analysis-interrupt-types-overview-zh.md) — 多维度分类：同步/异步中断、异常三子类（Fault/Trap/Abort）、中断控制器（PIC/I/O APIC/LAPIC/MSI/IPI）、触发模式（边沿/电平）、IDT 门类型（中断门/陷阱门/系统门）、上下半部机制（Softirq/Tasklet/Work Queue）、KVM 虚拟化中断路径（PIC 模拟→APICv→Direct Delivery→NoExit PVIPI）
+
+**Updated:**
+- [index.md](index.md) — Added analysis page entry
+
+## [2026-04-11] create | AVIC 是否需要 Guest Kernel 修改
+
+Created a Chinese-language analysis page examining whether AMD AVIC requires guest kernel changes (conclusion: no).
+
+**New analysis page:**
+- [analysis-avic-guest-kernel-changes-zh](analyses/analysis-avic-guest-kernel-changes-zh.md) — 分析 AVIC/x2AVIC 对 guest 的完全透明性：AVIC 三大硬件组件（Backing Page、AVIC Table、Doorbell）的 guest 不可见性、timer MSR 强制拦截的 host 端处理、x2AVIC (Zen 4+) 同样无需 guest 修改、与五类需要 guest 修改方案的详细对比（KVM PV IPI、NoExit PVIPI、PV EOI/TLB/调度、KVM-devirt BM）、guest 配置调优建议
+
+**Updated:**
+- [index.md](index.md) — Added analysis page entry
+
+## [2026-04-18] create | AMD PMC 溢出处理机制
+
+Created a Chinese-language analysis page on AMD PMC overflow handling: hardware bit-47 rollover detection, host perf driver per-counter polling, KVM emulated PMU overflow path, and Zen 4+ GlobalStatus improvements.
+
+**New analysis page:**
+- [analysis-amd-pmc-overflow](analyses/analysis-amd-pmc-overflow.md) — AMD PMC 溢出处理全链路：硬件层 bit47 翻转检测与 NMI 投递、amd_pmu_handle_irq() 逐计数器轮询、KVM 模拟 PMU 溢出路径（kvm_perf_overflow → global_status → PMI 注入）、Zen 4+ PerfCntrGlobalStatus 系列 MSR 改进、AMD vs Intel 差异对比
+
+**Updated:**
+- [index.md](index.md) — Added analysis page entry
+
+## [2026-04-18] update | AMD PMC 溢出处理——Zen 4+ Host/Guest 深度扩展
+
+Major expansion of the AMD PMC overflow analysis with comprehensive Zen 4+ PerfMonV2 coverage for both host and guest VM paths.
+
+**Updated analysis page:**
+- [analysis-amd-pmc-overflow](analyses/analysis-amd-pmc-overflow.md) — Added: CPUID 8000_0022 PerfMonV2 detection, MSR addresses (0xC0000300-303), GlobalCtl AND PerfEvtSel.EN semantics, amd_pmu_v2_init() initialization, amd_pmu_v2_handle_irq() five-step NMI handler with freeze/thaw, Zen3- vs Zen4+ side-by-side comparison, Guest VM full timeline (t0-t3) with per-step VM-Exit accounting (6-16 exits per overflow), KVM global_status software abstraction architecture, PerfMonV2 CPUID exposure to guest, mediated PMU gap analysis (missing VMCB atomic load/save fields), software-only mediated PMU race window analysis, future VMCB extension roadmap, three-layer comparison table
+
+**Updated:**
+- [index.md](index.md) — Updated analysis page description
+
+## [2026-04-18] create | RDPMC 不拦截对 Guest 溢出处理的影响
+
+Created analysis examining how non-intercepted RDPMC affects guest PMC overflow handling across emulated and mediated PMU modes.
+
+**New analysis page:**
+- [analysis-rdpmc-passthrough-overflow-impact](analyses/analysis-rdpmc-passthrough-overflow-impact.md) — 核心不变量分析（硬件计数器所有权决定 RDPMC 正确性）、模拟模式下六步溢出处理损坏推演（delta 错误→bit47 误判→重装漂移→采样损坏）、pmc_read_counter() 三源合成机制（base+emulated+perf_event_read）、中介模式 RDPMC 正确性证明、AMD 未来 mediated PMU 场景推演、四象限决策矩阵
+
+**Updated:**
+- [index.md](index.md) — Added analysis page entry

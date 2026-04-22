@@ -28,6 +28,7 @@ Content catalog for the Kernel Wiki. Organized by page type.
 - [src-bytedance-solution-vmexit](sources/src-bytedance-solution-vmexit.md) — Fu Qiuwei, Volcengine/ByteDance (InfoQ 2024-12: edge high-perf VM with interrupt non-exit, timer passthrough, VFIO bypass, IPI fastpath, dynamic isolation)
 - [src-bytedance-solution-vmexit-code](sources/src-bytedance-solution-vmexit-code.md) — dengqiao.joey, Yang Zhang, ByteDance (RFC patch 2020-09: Passthrough IPI implementation, pi_desc exposure to guest, 7K→2K cycle IPI)
 - [src-vmexit-opt-hitachi-sekiyama](sources/src-vmexit-opt-hitachi-sekiyama.md) — Chinese-language analysis of Sekiyama's direct interrupt delivery (CPU isolation + VMCS external-interrupt-exiting disable + NMI fallback + direct EOI), with explicit pros/cons evaluation
+- [src-kvm-devirt-kvmforum2022](sources/src-kvm-devirt-kvmforum2022.md) — Liang Deng, ByteDance STE (KVM Forum 2022): KVM-devirt zero-overhead partition hypervisor — interrupt/IPI/timer passthrough, memory/DMA devirtualization, 20-30% improvement over VM, 1% of native
 
 ## Entities
 
@@ -57,6 +58,7 @@ Content catalog for the Kernel Wiki. Organized by page type.
 
 ### PMU (Performance Monitoring)
 - [kvm-pmu-virtualization](entities/kvm-pmu-virtualization.md) — KVM PMU virtualization: kvm_pmu/kvm_pmc structures, emulated vs mediated modes, MSR handling, counter reprogramming, PMI delivery
+- [kvm-devirt](entities/kvm-devirt.md) — KVM-devirt zero-overhead partition hypervisor: interrupt/IPI/timer passthrough, memory/DMA devirtualization, virtio notification passthrough, Intel+AMD
 
 ### Virtualization and Isolation
 - [namespaces](entities/namespaces.md) — Linux namespaces: nsproxy, PID/UTS/IPC/mount/network/user namespaces, CLONE_NEW* flags, container building blocks
@@ -128,6 +130,7 @@ Content catalog for the Kernel Wiki. Organized by page type.
 - [concept-virtio-data-plane](concepts/concept-virtio-data-plane.md) — Virtio data plane optimization: control vs data plane, IOThread, vhost kernel offloading, device passthrough
 - [concept-reverse-debugging](concepts/concept-reverse-debugging.md) — Reverse debugging: process record/replay, reverse execution commands, checkpoints, hardware-assisted tracing
 - [concept-exitless-timer](concepts/concept-exitless-timer.md) — Exit-less timer: three vendor approaches (Tencent/Alibaba/ByteDance) to eliminating timer VM Exits in KVM
+- [concept-memory-devirtualization](concepts/concept-memory-devirtualization.md) — Memory de-virtualization: PV page table interfaces to eliminate EPT/NPT, single-level translation matching native performance
 
 ## Comparisons
 
@@ -144,4 +147,10 @@ Content catalog for the Kernel Wiki. Organized by page type.
 - [analysis-vm-exit-reduction-and-timer-virtualization](analyses/analysis-vm-exit-reduction-and-timer-virtualization.md) — VM Exit 消除发展历程与 Timer 虚拟化优化：五代硬件演进、Timer VM Exit 三大来源、六阶段优化技术、未来展望
 - [analysis-timer-vmexit-optimization-survey](analyses/analysis-timer-vmexit-optimization-survey.md) — Timer VM Exit 优化方案综述：十项优化技术演进、三家厂商 Exit-less Timer 对比、Volcengine 生产实践、未来展望
 - [analysis-direct-interrupt-delivery-sekiyama](analyses/analysis-direct-interrupt-delivery-sekiyama.md) — 直接中断投递深度分析：Sekiyama 六步构建法（CPU 隔离→VMCS 控制→IRQ 路由→NMI 回退→Direct EOI）、优缺点评估、APICv 软件先驱的历史定位
+- [analysis-kvm-devirt-partition-hypervisor](analyses/analysis-kvm-devirt-partition-hypervisor.md) — KVM-devirt 深度分析：合并 vs 分区范式转换、六项技术开销分解、内存去虚拟化关键创新、中断直通三代演进、安全性分析、与 Volcengine 方案对比、上游化挑战
 - [analysis-epyc-lapic-timer](analyses/analysis-epyc-lapic-timer.md) — AMD EPYC 平台 LAPIC Timer 分析：Host/Guest 工作模式、三种定时模式、AMD 平台特性、性能影响与调优建议
+- [analysis-lapic-oneshot-vs-tscdeadline-precision](analyses/analysis-lapic-oneshot-vs-tscdeadline-precision.md) — LAPIC One-shot vs TSC-Deadline 精度差别研究：时钟域差异、量化误差、编程延迟、虚拟化影响、实际场景分析
+- [analysis-interrupt-types-overview-zh](analyses/analysis-interrupt-types-overview-zh.md) — Linux 内核中断类型总览（中文）：同步/异步、控制器、触发模式、IDT 门类型、上下半部机制、KVM 虚拟化中断路径
+- [analysis-avic-guest-kernel-changes-zh](analyses/analysis-avic-guest-kernel-changes-zh.md) — AVIC 是否需要 Guest Kernel 修改：AVIC/x2AVIC 透明性分析、与 PV IPI/NoExit PVIPI/KVM-devirt 等需 guest 修改方案的对比
+- [analysis-amd-pmc-overflow](analyses/analysis-amd-pmc-overflow.md) — AMD PMC 溢出处理机制：传统 bit47 轮询 vs Zen 4+ PerfMonV2 全局控制、Host amd_pmu_v2_handle_irq() 全链路、Guest VM 模拟模式 MSR 处理与 VM-Exit 开销分析、AMD mediated PMU 差距与路线图
+- [analysis-rdpmc-passthrough-overflow-impact](analyses/analysis-rdpmc-passthrough-overflow-impact.md) — RDPMC 不拦截对 Guest 溢出处理的影响：模拟模式下 host/guest 计数器所有权不匹配导致 delta/bit47/重装全损坏、中介模式下正确工作的不变量分析、pmc_read_counter() 三源合成机制

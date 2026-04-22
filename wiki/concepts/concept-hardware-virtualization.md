@@ -2,8 +2,8 @@
 type: concept
 created: 2026-04-09
 updated: 2026-04-09
-sources: [qemu-kvm-source-code-and-application]
-tags: [virtualization, vmx, vt-x, hypervisor, trap-and-emulate]
+sources: [qemu-kvm-source-code-and-application, kvm-devirt-kvmforum2022]
+tags: [virtualization, vmx, vt-x, hypervisor, trap-and-emulate, partition-hypervisor]
 ---
 
 # Hardware Virtualization
@@ -150,6 +150,17 @@ Generation 5: Mediated PMU    -- PMU virtualization (eliminate perf counter emul
 
 The end state approaches bare-metal performance: the guest runs on the CPU with hardware-enforced isolation, hardware-translated memory, hardware-delivered interrupts, direct hardware device access, and direct PMU counter access. The hypervisor only intervenes for management operations and resource allocation, not for the data path. See [cmp-emulated-vs-mediated-pmu](../comparisons/cmp-emulated-vs-mediated-pmu.md) for a detailed comparison of the emulated and mediated PMU approaches.
 
+### Beyond Hardware Assistance: KVM-devirt
+
+ByteDance's [KVM-devirt](../entities/kvm-devirt.md) (KVM Forum 2022) takes the opposite approach to the hardware-assistance trajectory above. Rather than relying on ever-more-sophisticated hardware features (EPT, APICv, posted interrupts), KVM-devirt **removes the virtualization layers entirely** using paravirtualized interfaces:
+
+- **Memory de-virtualization**: Disables EPT/NPT; guest uses PV page table interfaces (`set_pgd`/`pte_val`) with direct gfn-to-pfn translation, achieving single-level page table walks identical to native. See [concept-memory-devirtualization](concept-memory-devirtualization.md)
+- **Interrupt passthrough**: Bypasses posted interrupts (too much hardware overhead); passes LAPIC registers directly to guest with separate host/guest vector ranges
+- **IPI/Timer passthrough**: Guest directly accesses ICR and MSR_TSCDEADLINE with address-translated values
+- **DMA de-virtualization**: Disables IOMMU DMA remap; guest translates addresses before issuing DMA
+
+The result: after guest kernel initialization, **all VM Exits and address translations are eliminated**. Benchmarks show BM (bare-metal guest) performance within 1% of native for a single partition, and **9% faster** than native with four partitions due to reduced kernel scalability contention. This positions KVM-devirt as a "Generation 6" approach — using the hypervisor for partitioning rather than consolidation.
+
 ## See also
 
 - [qemu-kvm-overview](../entities/qemu-kvm-overview.md)
@@ -157,4 +168,6 @@ The end state approaches bare-metal performance: the guest runs on the CPU with 
 - [kvm-memory-virtualization](../entities/kvm-memory-virtualization.md)
 - [kvm-interrupt-virtualization](../entities/kvm-interrupt-virtualization.md)
 - [kvm-pmu-virtualization](../entities/kvm-pmu-virtualization.md)
+- [kvm-devirt](../entities/kvm-devirt.md)
+- [concept-memory-devirtualization](concept-memory-devirtualization.md)
 - [vfio-device-passthrough](../analyses/analysis-vfio-device-passthrough.md)

@@ -45,6 +45,8 @@ LAPIC timer 支持三种工作模式，通过 LVT (Local Vector Table) Timer 寄
 | **One-shot（单次触发模式）** | bit 17=0 | 触发一次后停止 | 依赖总线频率 | tickless 内核 |
 | **TSC-Deadline（TSC 截止时间模式）** | bit 18=1 | TSC 到达目标值时触发 | 纳秒级（TSC 精度） | 现代高精度定时 |
 
+> **精度对比详见**：[LAPIC One-shot vs TSC-Deadline 精度差别研究](analysis-lapic-oneshot-vs-tscdeadline-precision.md)——TSC-Deadline 分辨率比 One-shot 高 10-200 倍，抖动低 2-5 倍，根本原因是时钟域不同（core TSC 2-5 GHz vs bus clock 100-400 MHz）。
+
 ### 2.2 内核时钟框架集成
 
 LAPIC timer 通过 Linux 内核的 `clockevents` 框架注册为时钟事件设备（clock event device）：

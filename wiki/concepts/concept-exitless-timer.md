@@ -2,7 +2,7 @@
 type: concept
 created: 2026-04-10
 updated: 2026-04-10
-sources: [all-solution-vmexit, bytedance-solution-vmexit, minimizing-vmexits-pv-ipi-passthrough-timer, lcna-co2012-sekiyama]
+sources: [all-solution-vmexit, bytedance-solution-vmexit, minimizing-vmexits-pv-ipi-passthrough-timer, lcna-co2012-sekiyama, kvm-devirt-kvmforum2022]
 tags: [vm-exit, timer, exitless-timer, kvm, lapic, tsc-deadline, posted-interrupt, timer-passthrough, performance]
 ---
 
@@ -109,6 +109,8 @@ Exit-less timer is one component of a broader effort to achieve zero-VM-Exit vir
 
 The progression of hardware features (VT-x → EPT → APICv → Posted Interrupts → APIC Timer hardware acceleration) systematically reduces VM Exits, but software techniques like exit-less timer bridge the gap until hardware support is widely available.
 
+ByteDance's [KVM-devirt](../entities/kvm-devirt.md) (KVM Forum 2022) integrates timer passthrough as one of six techniques in a comprehensive zero-overhead partition hypervisor. In that context, BM uses the physical LAPIC timer directly while the host falls back to broadcast timer, and KVM maps the TSC offset into the guest so it can program MSR_TSCDEADLINE with host-adjusted values. Timer latency benchmarks show BM matching native host on both Intel and AMD platforms.
+
 ## See also
 
 - [kvm-interrupt-virtualization](../entities/kvm-interrupt-virtualization.md)
@@ -116,4 +118,6 @@ The progression of hardware features (VT-x → EPT → APICv → Posted Interrup
 - [concept-hardware-virtualization](concept-hardware-virtualization.md)
 - [analysis-vm-exit-reduction-and-timer-virtualization](../analyses/analysis-vm-exit-reduction-and-timer-virtualization.md)
 - [src-all-solution-vmexit](../sources/src-all-solution-vmexit.md)
+- [kvm-devirt](../entities/kvm-devirt.md)
+- [src-kvm-devirt-kvmforum2022](../sources/src-kvm-devirt-kvmforum2022.md)
 - [src-bytedance-solution-vmexit](../sources/src-bytedance-solution-vmexit.md)
